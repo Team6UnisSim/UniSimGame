@@ -5,11 +5,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.Array;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class MainGame implements ApplicationListener {
@@ -17,10 +15,7 @@ public class MainGame implements ApplicationListener {
     OrthographicCamera cam;
     SpriteBatch batch;
     Map map;
-    Texture example;
-    Building building;
-    Building building2;
-    Stage stage;
+    Array<Building> buildings;
 
     @Override
     public void create() {
@@ -28,14 +23,7 @@ public class MainGame implements ApplicationListener {
         batch = new SpriteBatch();
         map = new Map();
         cam = new OrthographicCamera(480, 320);
-        example = new Texture("free.png");
-        building = new Building(240, 160, "1");
-        building2 = new Building(120, 40, "2");
-        
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
-        myActor actor = new myActor();
-        stage.addActor(actor);
+        buildings = new Array<>();
 
         cam.position.set(240, 160, 0);
         cam.update();
@@ -48,7 +36,6 @@ public class MainGame implements ApplicationListener {
 		cam.viewportHeight = 480f * height/width;
 		cam.update();
 
-        stage.getViewport().update(width, height, true);
     }
 
     @Override
@@ -60,19 +47,14 @@ public class MainGame implements ApplicationListener {
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        map.render(cam, batch, example);
+        map.render(cam, batch);
 
         batch.begin();
-        building.handleLogic();
-        building.render(batch);
-        if(building.checkPlaced()) {
-            building2.handleLogic();
-            building2.render(batch);
+        for(Building i : buildings) {
+            i.handleLogic(cam, map, buildings);
+            i.render(batch);
         }
         batch.end();
-
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
     }
 
     private void handleInput() {
@@ -93,6 +75,11 @@ public class MainGame implements ApplicationListener {
 
 		cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, 480 - effectiveViewportWidth / 2f);
 		cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, 320 - effectiveViewportHeight / 2f);
+    
+        if(Gdx.input.isKeyJustPressed(47)) {
+            Building building = new Building(240, 160, "House");
+            buildings.add(building);
+        }
     }
 
     @Override
@@ -109,6 +96,5 @@ public class MainGame implements ApplicationListener {
     public void dispose() {
         // Destroy application's resources here.
         batch.dispose();
-        stage.dispose();
     }
 }
