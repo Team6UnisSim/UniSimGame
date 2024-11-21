@@ -1,0 +1,15 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensures the page takes up the full viewport height */
+    margin: 0;
+    padding: 50px;
+    background: rgb(223, 244, 255);
+    font-family: "Verdana", sans-serif;
+    box-sizing: border-box;
+}
+
+.content {
+    flex-grow: 1; /* Allows content to take up available space without adding extra space */
+    text-align: justify;
+}
